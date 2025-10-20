@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Respuesta Tumoral</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 40px;
+      background-color: #f5f7fa;
+      color: #222;
+    }
+    h1 {
+      color: #004080;
+    }
+    pre {
+      background-color: #eee;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: Consolas, monospace;
+    }
+    .nota {
+      background: #d9edf7;
+      border-left: 4px solid #31708f;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Respuesta Tumoral</h1>
+  <p>
+    Este programa en <strong>Python</strong> automatiza el cálculo de la respuesta en enfermedades tumorales
+    (como <em>mieloma</em> y <em>linfomas</em>), según los valores <code>a</code> (diagnóstico) y <code>b</code> (post-tratamiento).
+  </p>
+
+  <div class="nota">
+    <p>�� <strong>Notas:</strong>  
+    La respuesta se calcula con la fórmula:<br>
+    <code>[((a/b)×100)−100]×(−1)</code><br>
+    y se clasifica como:
+    <ul>
+      <li>Completa: si desaparece el componente.</li>
+      <li>Muy buena respuesta parcial: disminución &gt; 90%.</li>
+      <li>Respuesta parcial: entre 50% y 90%.</li>
+      <li>Sin respuesta: &lt; 50%.</li>
+    </ul>
+    </p>
+  </div>
+
+  <h2>Código en Python</h2>
+  <pre><code>
+from dataclasses import dataclass
+from typing import Optional, Literal, List, Dict
+
+Disease = Literal["mieloma", "linfoma", "otro"]
+
+@dataclass
+class ResponseResult:
+    enfermedad: Disease
+    a: float
+    b: float
+    respuesta_pct: float
+    categoria: str
+    nota: Optional[str] = None
+
+def calcular_respuesta_porcentaje(a: float, b: float) -> float:
+    if a < 0 or b < 0:
+        raise ValueError("Los valores a y b deben ser no negativos.")
+    if b == 0:
+        return 100.0
+    if a == 0:
+        return 100.0
+    return (1 - (a / b)) * 100.0
+
+def clasificar_respuesta(respuesta_pct: float, desaparece: bool,
+                         inclusivo: bool = True) -> str:
+    if desaparece:
+        return "Completa"
+    if respuesta_pct < 0:
+        return "Progresión"
+    if inclusivo:
+        if respuesta_pct >= 90:
+            return "Muy buena respuesta parcial"
+        if 50 <= respuesta_pct < 90:
+            return "Respuesta parcial"
+        return "Sin respuesta"
+    else:
+        if respuesta_pct > 90:
+            return "Muy buena respuesta parcial"
+        if 50 < respuesta_pct < 90:
+            return "Respuesta parcial"
+        return "Sin respuesta"
+
+def evaluar_respuesta(enfermedad: Disease, a: float, b: float,
+                      inclusivo: bool = True) -> ResponseResult:
+    nota = None
+    if a == 0:
+        nota = "a=0 (valor basal nulo); porcentaje interpretado como 100%."
+    respuesta = calcular_respuesta_porcentaje(a, b)
+    categoria = clasificar_respuesta(respuesta, desaparece=(b == 0), inclusivo=inclusivo)
+    return ResponseResult(enfermedad, a, b, round(respuesta, 2), categoria, nota)
+
+print("=== Evaluador de respuesta tumoral ===")
+enfermedad = input("Tipo de enfermedad (mieloma / linfoma / otro): ").strip().lower()
+a = float(input("Valor basal (diagnóstico): "))
+b = float(input("Valor post-tratamiento: "))
+
+resultado = evaluar_respuesta(enfermedad, a, b)
+print("\n--- RESULTADO ---")
+print(f"Enfermedad: {resultado.enfermedad}")
+print(f"Disminución porcentual: {resultado.respuesta_pct}%")
+print(f"Clasificación: {resultado.categoria}")
+  </code></pre>
+
+  <p style="margin-top: 20px; font-size: 0.9em; color: #555;">
+    © 2025 — Ejemplo educativo desarrollado para fines académicos.
+  </p>
+</body>
+</html>
