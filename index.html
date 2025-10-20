@@ -32,6 +32,10 @@
       border-radius: 6px;
     }
   </style>
+  <!-- MathJax para renderizar LaTeX -->
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
   <h1>Calculadora de Respuesta Tumoral</h1>
@@ -41,17 +45,23 @@
   </p>
 
   <div class="nota">
-    <p>�� <strong>Notas:</strong>  
-    La respuesta se calcula con la fórmula:<br>
-    <code>[((a/b)×100)−100]×(−1)</code><br>
-    y se clasifica como:
+    <p>�� <strong>Notas:</strong></p>
+    <p>La respuesta se calcula con la fórmula (LaTeX):</p>
+    <p>
+      \[
+        \text{Respuesta} = \bigl(1 - \tfrac{a}{b}\bigr)\times 100
+      \]
+    </p>
+    <p style="margin-top:8px">
+      (Equivalente en notación de código:
+      <code>(1 - (a/b)) * 100</code>)
+    </p>
     <ul>
       <li>Completa: si desaparece el componente.</li>
       <li>Muy buena respuesta parcial: disminución &gt; 90%.</li>
       <li>Respuesta parcial: entre 50% y 90%.</li>
       <li>Sin respuesta: &lt; 50%.</li>
     </ul>
-    </p>
   </div>
 
   <h2>Código en Python</h2>
