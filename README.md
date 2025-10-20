@@ -9,6 +9,7 @@ Permite estimar el porcentaje de disminución entre el valor basal (diagnóstico
 \]
 
 ---
+**Problema 1. Propuesto por Oscar Peña MD y desarrollado por Oscar Peña y José Ricardo ARTEAGA BEJARANO
 
 ## ⚙️ Funcionamiento
 
@@ -38,3 +39,5 @@ El programa en Python calcula la disminución porcentual y clasifica la respuest
 from respuesta_tumoral import evaluar_respuesta
 resultado = evaluar_respuesta("mieloma", a=3.5, b=0.2)
 print(resultado)
+
+
