@@ -5,7 +5,7 @@ Calculadora para obtener los **rangos orientativos de respuesta tumoral** en enf
 Permite estimar el porcentaje de disminución entre el valor basal (diagnóstico) y el valor post-tratamiento según la fórmula:
 
 \[
-\text{Respuesta} = \bigl[((a/b) \times 100) - 100 \bigr] \times (-1)
+\text{Respuesta} = \bigl[( 1 - (a/b) \bigr] \times 100
 \]
 
 ---
