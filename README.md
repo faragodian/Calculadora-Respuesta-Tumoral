@@ -28,7 +28,7 @@ El programa en Python calcula la disminución porcentual y clasifica la respuest
 ## 💻 Archivos incluidos
 
 - **`index.html`** → Página descriptiva con notas explicativas y el código en Python.  
-- **`OP_problema1.ipynb`** → Script Python para ejecución local o en Google Colab.
+- **`OP_Problema_1.ipynb`** → Script Python para ejecución local o en Google Colab.
 
 ---
 
