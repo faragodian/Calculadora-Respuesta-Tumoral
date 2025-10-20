@@ -8,9 +8,6 @@ $$
 \text{Respuesta} = \bigl(1 - \tfrac{a}{b}\bigr)\times 100
 $$
 
-> *Nota:* si no ves la fórmula renderizada en tu visualizador, GitHub la muestra correctamente en la vista del repo.  
-> Versión en texto plano: `Respuesta = (1 - (a/b)) * 100`.
-
 ---
 
 **Problema 1.** Propuesto por **Oscar Peña, MD** y desarrollado por **Oscar Peña** y **José Ricardo Arteaga Bejarano**.
