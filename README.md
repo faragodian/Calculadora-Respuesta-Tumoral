@@ -9,7 +9,7 @@ Permite estimar el porcentaje de disminución entre el valor basal (diagnóstico
 \]
 
 ---
-**Problema 1. Propuesto por Oscar Peña MD y desarrollado por Oscar Peña y José Ricardo ARTEAGA BEJARANO
+**Problema 1. Propuesto por Oscar Peña MD y desarrollado por Oscar Peña y José Ricardo ARTEAGA BEJARANO**
 
 ## ⚙️ Funcionamiento
 
