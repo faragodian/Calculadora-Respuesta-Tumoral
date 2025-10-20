@@ -1,136 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Respuesta Tumoral</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 40px;
-      background-color: #f5f7fa;
-      color: #222;
-    }
-    h1 {
-      color: #004080;
-    }
-    pre {
-      background-color: #eee;
-      padding: 15px;
-      border-radius: 8px;
-      overflow-x: auto;
-    }
-    code {
-      font-family: Consolas, monospace;
-    }
-    .nota {
-      background: #d9edf7;
-      border-left: 4px solid #31708f;
-      padding: 10px;
-      margin-top: 15px;
-      border-radius: 6px;
-    }
+    :root { --bg:#f6f8fb; --fg:#1f2937; --pri:#0d6efd; --card:#ffffff; --muted:#6b7280; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--fg); }
+    .wrap { max-width: 760px; margin: 40px auto; padding: 0 16px; }
+    h1 { margin: 0 0 8px; color: #0a3a7a; }
+    p.lead { margin: 0 0 20px; color: var(--muted); }
+    .card { background: var(--card); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.06); padding: 18px; margin: 18px 0; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { font-size: 14px; color: #334155; margin-bottom: 6px; display: inline-block; }
+    input, select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 16px; background: #fff; }
+    button { padding: 12px 16px; border: 0; border-radius: 10px; background: var(--pri); color: #fff; font-size: 16px; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .actions { display: flex; gap: 10px; margin-top: 10px; }
+    .result { font-size: 16px; }
+    .result strong { color: #0a7a54; }
+    .error { color: #b00020; font-weight: 600; }
+    .note { font-size: 14px; color: var(--muted); }
+    .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px;}
+    .kpi .item { background:#f3f4f6; border-radius:10px; padding:10px; text-align:center; }
+    .kpi .item .label { font-size:12px; color:#6b7280; }
+    .kpi .item .val { font-weight:700; font-size:18px; }
+    footer { margin: 24px 0; font-size: 12px; color: var(--muted); }
   </style>
-  <!-- MathJax para renderizar LaTeX -->
-  <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
 </head>
 <body>
-  <h1>Calculadora de Respuesta Tumoral</h1>
-  <p>
-    Este programa en <strong>Python</strong> automatiza el cálculo de la respuesta en enfermedades tumorales
-    (como <em>mieloma</em> y <em>linfomas</em>), según los valores <code>a</code> (diagnóstico) y <code>b</code> (post-tratamiento).
-  </p>
+  <div class="wrap">
+    <h1>Calculadora de Respuesta Tumoral</h1>
+    <p class="lead">Ingresa <em>a</em> (diagnóstico), <em>b</em> (post-tratamiento) y el tipo de enfermedad. La app calcula la disminución y la clasifica.</p>
 
-  <div class="nota">
-    <p>�� <strong>Notas:</strong></p>
-    <p>La respuesta se calcula con la fórmula (LaTeX):</p>
-    <p>
-      \[
-        \text{Respuesta} = \bigl(1 - \tfrac{a}{b}\bigr)\times 100
-      \]
-    </p>
-    <p style="margin-top:8px">
-      (Equivalente en notación de código:
-      <code>(1 - (a/b)) * 100</code>)
-    </p>
-    <ul>
-      <li>Completa: si desaparece el componente.</li>
-      <li>Muy buena respuesta parcial: disminución &gt; 90%.</li>
-      <li>Respuesta parcial: entre 50% y 90%.</li>
-      <li>Sin respuesta: &lt; 50%.</li>
-    </ul>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="enfermedad">Tipo de enfermedad</label>
+          <select id="enfermedad" autocomplete="off">
+            <option value="mieloma">Mieloma</option>
+            <option value="linfoma">Linfoma</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label for="a">a — Valor basal (diagnóstico)</label>
+          <input id="a" type="number" step="any" min="0" placeholder="ej. 3.5" />
+        </div>
+        <div>
+          <label for="b">b — Valor post-tratamiento</label>
+          <input id="b" type="number" step="any" min="0" placeholder="ej. 0.2" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnCalcular">Calcular</button>
+        <button id="btnLimpiar" type="button">Limpiar</button>
+      </div>
+      <div id="msg" class="result" style="margin-top:14px;"></div>
+
+      <div id="kpis" class="kpi" style="display:none;">
+        <div class="item"><div class="label">Enfermedad</div><div id="k_enf" class="val">—</div></div>
+        <div class="item"><div class="label">a</div><div id="k_a" class="val">—</div></div>
+        <div class="item"><div class="label">b</div><div id="k_b" class="val">—</div></div>
+        <div class="item"><div class="label">Disminución</div><div id="k_pct" class="val">—</div></div>
+      </div>
+
+      <p class="note" style="margin-top:10px;">
+        Fórmula usada: <code>(1 - (a/b)) × 100</code>. Umbrales inclusivos: ≥90% y ≥50%.
+      </p>
+    </div>
+
+    <div class="card">
+      <strong>Clasificación</strong>
+      <ul style="margin:10px 0 0 18px;">
+        <li>Completa: si desaparece el componente (b = 0).</li>
+        <li>Muy buena respuesta parcial: disminución ≥ 90 %.</li>
+        <li>Respuesta parcial: 50 % ≤ disminución &lt; 90 %.</li>
+        <li>Sin respuesta: disminución &lt; 50 %.</li>
+        <li>Progresión: si la “disminución” es negativa (aumentó tras el tratamiento).</li>
+      </ul>
+    </div>
+
+    <footer>© 2025 — Uso educativo. Basado en la misma lógica del script en Python.</footer>
   </div>
 
-  <h2>Código en Python</h2>
-  <pre><code>
-from dataclasses import dataclass
-from typing import Optional, Literal, List, Dict
+  <script>
+    function calcularRespuestaPorcentaje(a, b) {
+      if (a < 0 || b < 0) throw new Error("Los valores a y b deben ser no negativos.");
+      if (b === 0) return 100.0;   // Desaparición completa
+      if (a === 0) return 100.0;   // Caso especial (anotado)
+      return (1 - (a / b)) * 100.0;
+    }
 
-Disease = Literal["mieloma", "linfoma", "otro"]
+    function clasificar(resPct, desaparece, inclusivo = true) {
+      if (desaparece) return "Completa";
+      if (resPct < 0) return "Progresión";
+      if (inclusivo) {
+        if (resPct >= 90) return "Muy buena respuesta parcial";
+        if (resPct >= 50 && resPct < 90) return "Respuesta parcial";
+        return "Sin respuesta";
+      } else {
+        if (resPct > 90) return "Muy buena respuesta parcial";
+        if (resPct > 50 && resPct < 90) return "Respuesta parcial";
+        return "Sin respuesta";
+      }
+    }
 
-@dataclass
-class ResponseResult:
-    enfermedad: Disease
-    a: float
-    b: float
-    respuesta_pct: float
-    categoria: str
-    nota: Optional[str] = None
+    function fmt(x) {
+      return (Math.round(x * 100) / 100).toFixed(2);
+    }
 
-def calcular_respuesta_porcentaje(a: float, b: float) -> float:
-    if a < 0 or b < 0:
-        raise ValueError("Los valores a y b deben ser no negativos.")
-    if b == 0:
-        return 100.0
-    if a == 0:
-        return 100.0
-    return (1 - (a / b)) * 100.0
+    const $ = (id) => document.getElementById(id);
+    $("btnCalcular").addEventListener("click", () => {
+      const enf = $("enfermedad").value;
+      const a = parseFloat($("a").value);
+      const b = parseFloat($("b").value);
+      const msg = $("msg");
 
-def clasificar_respuesta(respuesta_pct: float, desaparece: bool,
-                         inclusivo: bool = True) -> str:
-    if desaparece:
-        return "Completa"
-    if respuesta_pct < 0:
-        return "Progresión"
-    if inclusivo:
-        if respuesta_pct >= 90:
-            return "Muy buena respuesta parcial"
-        if 50 <= respuesta_pct < 90:
-            return "Respuesta parcial"
-        return "Sin respuesta"
-    else:
-        if respuesta_pct > 90:
-            return "Muy buena respuesta parcial"
-        if 50 < respuesta_pct < 90:
-            return "Respuesta parcial"
-        return "Sin respuesta"
+      // Validación
+      if (Number.isNaN(a) || Number.isNaN(b)) {
+        msg.innerHTML = '<span class="error">Por favor ingresa valores numéricos en a y b.</span>';
+        $("kpis").style.display = "none";
+        return;
+      }
+      if (a < 0 || b < 0) {
+        msg.innerHTML = '<span class="error">a y b deben ser ≥ 0.</span>';
+        $("kpis").style.display = "none";
+        return;
+      }
 
-def evaluar_respuesta(enfermedad: Disease, a: float, b: float,
-                      inclusivo: bool = True) -> ResponseResult:
-    nota = None
-    if a == 0:
-        nota = "a=0 (valor basal nulo); porcentaje interpretado como 100%."
-    respuesta = calcular_respuesta_porcentaje(a, b)
-    categoria = clasificar_respuesta(respuesta, desaparece=(b == 0), inclusivo=inclusivo)
-    return ResponseResult(enfermedad, a, b, round(respuesta, 2), categoria, nota)
+      try {
+        const resPct = calcularRespuestaPorcentaje(a, b);
+        const cat = clasificar(resPct, b === 0, true);
+        const nota = (a === 0) ? "Nota: a=0 (valor basal nulo); porcentaje interpretado como 100%." : "";
 
-print("=== Evaluador de respuesta tumoral ===")
-enfermedad = input("Tipo de enfermedad (mieloma / linfoma / otro): ").strip().lower()
-a = float(input("Valor basal (diagnóstico): "))
-b = float(input("Valor post-tratamiento: "))
+        // Mostrar resumen
+        $("k_enf").textContent = enf;
+        $("k_a").textContent = fmt(a);
+        $("k_b").textContent = fmt(b);
+        $("k_pct").textContent = fmt(resPct) + "%";
+        $("kpis").style.display = "grid";
 
-resultado = evaluar_respuesta(enfermedad, a, b)
-print("\n--- RESULTADO ---")
-print(f"Enfermedad: {resultado.enfermedad}")
-print(f"Disminución porcentual: {resultado.respuesta_pct}%")
-print(f"Clasificación: {resultado.categoria}")
-  </code></pre>
+        msg.innerHTML = `
+          <div><strong>Clasificación:</strong> ${cat}</div>
+          <div><strong>Disminución porcentual:</strong> ${fmt(resPct)}%</div>
+          ${nota ? `<div class="note">${nota}</div>` : ""}
+        `;
+      } catch (e) {
+        msg.innerHTML = `<span class="error">${e.message}</span>`;
+        $("kpis").style.display = "none";
+      }
+    });
 
-  <p style="margin-top: 20px; font-size: 0.9em; color: #555;">
-    © 2025 — Ejemplo educativo desarrollado para fines académicos.
-  </p>
+    $("btnLimpiar").addEventListener("click", () => {
+      $("a").value = "";
+      $("b").value = "";
+      $("enfermedad").value = "mieloma";
+      $("msg").innerHTML = "";
+      $("kpis").style.display = "none";
+    });
+  </script>
 </body>
 </html>
